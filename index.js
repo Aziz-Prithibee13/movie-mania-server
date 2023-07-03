@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+
+const teachableMachine = require("@sashido/teachablemachine-node");
 const { graphqlHTTP } = require("express-graphql")
 const graphql = require('graphql');
 
@@ -29,8 +31,9 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-
-
+        const model = new teachableMachine({
+            modelUrl: "https://teachablemachine.withgoogle.com/models/V2vfM0Dv-/",
+          });
 
         const moviesCollection = client.db("Movie-Mania").collection("Moies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
