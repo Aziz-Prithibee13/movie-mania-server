@@ -96,7 +96,7 @@ async function run() {
             console.log('file', req.files);
             console.log('body', req.body);
 
-            res.send({ message : 'Success'})
+            res.send({ body : req.body , file : req.file})
         })
 
     } finally {
