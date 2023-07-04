@@ -4,11 +4,11 @@ const cors = require('cors');
 const teachableMachine = require("@sashido/teachablemachine-node");
 const { graphqlHTTP } = require("express-graphql")
 const graphql = require('graphql');
-
+const multer = require('multer')
 const { Mongoose, default: mongoose } = require('mongoose');
 
 const { GraphQLObjectType, GraphQLString, GraphQLSchema, buildSchema } = graphql
- 
+
 
 
 
@@ -33,7 +33,19 @@ async function run() {
     try {
         const model = new teachableMachine({
             modelUrl: "https://teachablemachine.withgoogle.com/models/V2vfM0Dv-/",
-          });
+        });
+
+        const storage = multer.diskStorage({
+            destination(req, file, callback) {
+                callback(null, './images');
+            },
+            filename(req, file, callback) {
+                callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
+            },
+        });
+
+
+        const upload = multer({ storage });
 
         const moviesCollection = client.db("Movie-Mania").collection("Moies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
@@ -69,16 +81,22 @@ async function run() {
         })
 
 
-        app.get('/trailer/:id', async(req,res)=>
-        {
+        app.get('/trailer/:id', async (req, res) => {
             const id = req.params.id;
 
-            const query = {movieID : id};
+            const query = { movieID: id };
 
             const cursor = trailerCollection.find(query);
             const item = await cursor.toArray();
 
             res.send(item)
+        })
+
+        app.post('/classification/upload', upload.array('photo', 3), async (req, res) => {
+            console.log('file', req.files);
+            console.log('body', req.body);
+
+            res.send({ message : 'Success'})
         })
 
     } finally {
