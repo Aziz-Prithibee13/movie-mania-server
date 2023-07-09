@@ -1,10 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-
 const teachableMachine = require("@sashido/teachablemachine-node");
 const { graphqlHTTP } = require("express-graphql")
 const graphql = require('graphql');
-const multer = require('multer')
 const { Mongoose, default: mongoose } = require('mongoose');
 
 const { GraphQLObjectType, GraphQLString, GraphQLSchema, buildSchema } = graphql
@@ -44,8 +42,6 @@ async function run() {
             },
         });
 
-
-        const upload = multer({ storage });
 
         const moviesCollection = client.db("Movie-Mania").collection("Moies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
@@ -92,12 +88,24 @@ async function run() {
             res.send(item)
         })
 
-        app.post('/classification/upload', upload.array('photo', 3), async (req, res) => {
-            console.log('file', req.files);
-            console.log('body', req.body);
-
-            res.send({ body : req.body , file : req.file})
-        })
+        app.post("/classification", async (req, res) => {
+            const url = req.body.url;
+      
+            console.log(url);
+      
+            return await model
+              .classify({
+                imageUrl: url,
+              })
+              .then((predictions) => {
+                console.log(predictions);
+                return res.send(predictions);
+              })
+              .catch((e) => {
+                console.error(e);
+                res.status(500).send("Something went wrong!");
+              });
+          });
 
     } finally {
         /* await client.close(); */
