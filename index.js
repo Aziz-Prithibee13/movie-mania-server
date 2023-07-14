@@ -3,9 +3,11 @@ const cors = require('cors');
 const teachableMachine = require("@sashido/teachablemachine-node");
 const { graphqlHTTP } = require("express-graphql")
 const graphql = require('graphql');
-const { Mongoose, default: mongoose } = require('mongoose');
+const { Mongoose, default: mongoose, Types: { ObjectId } } = require('mongoose');
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, buildSchema } = graphql
+const { buildSchema } = graphql;
+
+const detailes = require('./Model/Detailes')
 
 
 
@@ -20,7 +22,7 @@ const port = process.env.PORT || 8000;
 app.use(cors())
 app.use(express.json())
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dbobibq.mongodb.net/?retryWrites=true&w=majority`;
@@ -35,8 +37,44 @@ async function run() {
 
 
 
-        const moviesCollection = client.db("Movie-Mania").collection("Moies");
+
+
+        const moviesCollection = client.db("Movie-Mania").collection("movies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
+
+        app.use('/graphql', graphqlHTTP({
+            schema: buildSchema(`
+                   
+            
+            type detailes
+            {
+                relase_year : String!
+                release_country : String!
+                cost : String!
+                income : String!
+            }
+
+
+            type RootQuery 
+            {
+                data(id: String!) : [detailes!]!
+            }
+       
+            schema 
+            {
+                query: RootQuery
+            }
+            
+            `
+            ),
+            rootValue: {
+                data: async (id) => {
+                    const newDetailes = await detailes.findById(new ObjectId(id));
+                    return newDetailes ? [newDetailes] : [];
+                }
+            },
+            graphiql: true
+        }))
 
         app.get("/movies", async (req, res) => {
             const query = {};
@@ -82,22 +120,22 @@ async function run() {
 
         app.post("/classification", async (req, res) => {
             const url = req.body.url;
-      
+
             console.log(url);
-      
+
             return await model
-              .classify({
-                imageUrl: url,
-              })
-              .then((predictions) => {
-                console.log(predictions);
-                return res.send(predictions);
-              })
-              .catch((e) => {
-                console.error(e);
-                res.status(500).send("Something went wrong!");
-              });
-          });
+                .classify({
+                    imageUrl: url,
+                })
+                .then((predictions) => {
+                    console.log(predictions);
+                    return res.send(predictions);
+                })
+                .catch((e) => {
+                    console.error(e);
+                    res.status(500).send("Something went wrong!");
+                });
+        });
 
     } finally {
         /* await client.close(); */
@@ -113,7 +151,9 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-
+    mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dbobibq.mongodb.net/Movie-Mania?retryWrites=true&w=majority`).catch((err) => {
+        console.log(err);
+    })
     client.connect((err) => {
         if (err) console.log(err);
         else console.log("Database Connected Successfully");
