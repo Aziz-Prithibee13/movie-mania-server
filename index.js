@@ -7,6 +7,8 @@ const { Mongoose, default: mongoose, Types: { ObjectId } } = require('mongoose')
 
 const { buildSchema } = graphql;
 
+const DataLoader = require('dataloader')
+
 const detailes = require('./Model/Detailes')
 
 
@@ -37,8 +39,17 @@ async function run() {
 
 
 
-
-
+        const detailsLoader = new DataLoader(async (ids) => {
+            const objectIds = ids.map(id => new ObjectId(id));
+            const details = await detailes.find({ _id: { $in: objectIds } });
+          
+            const detailsMap = {};
+            details.forEach((detail) => {
+              detailsMap[detail._id.toString()] = detail;
+            });
+          
+            return ids.map((id) => detailsMap[id.toString()]);
+          });
         const moviesCollection = client.db("Movie-Mania").collection("movies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
 
@@ -68,9 +79,9 @@ async function run() {
             `
             ),
             rootValue: {
-                data: async (id) => {
-                    const newDetailes = await detailes.findById(new ObjectId(id));
-                    return newDetailes ? [newDetailes] : [];
+                data: async ({id}) => {
+                    const newDetails = await detailsLoader.load(id);
+                    return newDetails ? [newDetails] : [];
                 }
             },
             graphiql: true
