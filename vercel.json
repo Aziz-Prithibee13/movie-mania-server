@@ -3,10 +3,7 @@
     "builds": [
         {
             "src": "./index.js",
-            "use": "@vercel/node",
-            "config" : {
-                "timeout" : "500"
-            }
+            "use": "@vercel/node"
         }
     ],
     "routes": [
