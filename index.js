@@ -34,6 +34,8 @@ async function run() {
 
         const moviesCollection = client.db("Movie-Mania").collection("movies");
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
+        const reviewCollection = client.db("Movie-Mania").collection("reviews");
+        const reactsCollection = client.db("Movie-Mania").collection("reacts");
 
 
         app.use('/graphql', gqlHandler)
@@ -98,6 +100,46 @@ async function run() {
                     res.status(500).send("Something went wrong!");
                 });
         });
+
+
+        app.post("/review", async (req, res) => {
+
+            const reviewDetailes = req.body;
+
+            const result = await reviewCollection.insertOne(reviewDetailes)
+
+            res.send(result);
+
+
+        })
+
+        app.get("/review", async (req, res) => {
+            const email = req.query.email
+
+            let items;
+      
+      
+            if (email) {
+              const query = { email: email };
+      
+              const cursor = reviewCollection.find(query);
+      
+              items = await cursor.toArray();
+            }
+            else {
+              const query = {};
+      
+              const cursor = reviewCollection.find(query);
+      
+              items = await cursor.toArray();
+            }
+      
+      
+      
+      
+            console.log(items);
+            res.send(items);
+        })
 
     } finally {
         /* await client.close(); */
