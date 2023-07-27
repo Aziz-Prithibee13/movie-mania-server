@@ -38,7 +38,8 @@ async function run() {
         const reactsCollection = client.db("Movie-Mania").collection("reacts");
 
 
-        app.use('/graphql', gqlHandler)
+
+        app.use('/graphql' , gqlHandler)
 
         app.get("/movies", async (req, res) => {
             const query = {};
