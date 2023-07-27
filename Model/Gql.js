@@ -56,6 +56,7 @@ const gqlHandler = graphqlHTTP({
 
 const config = {
     runtime: 'edge',
+    regions: ['bom1'],
 };
 
 
