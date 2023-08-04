@@ -36,10 +36,11 @@ async function run() {
         const trailerCollection = client.db("Movie-Mania").collection("trailer");
         const reviewCollection = client.db("Movie-Mania").collection("reviews");
         const reactsCollection = client.db("Movie-Mania").collection("reacts");
+        const usersCollection = client.db("Movie-Mania").collection("users");
 
 
 
-        app.use('/graphql' , gqlHandler)
+        app.use('/graphql', gqlHandler)
 
         app.get("/movies", async (req, res) => {
             const query = {};
@@ -116,31 +117,91 @@ async function run() {
 
         app.get("/review", async (req, res) => {
             const email = req.query.email
+            const movieId = req.query.id
 
             let items;
-      
-      
+
+
             if (email) {
-              const query = { email: email };
-      
-              const cursor = reviewCollection.find(query);
-      
-              items = await cursor.toArray();
+                const query = { email: email , movieId : movieId};
+
+                const cursor = reviewCollection.find(query);
+
+                items = await cursor.toArray();
             }
             else {
-              const query = {};
-      
-              const cursor = reviewCollection.find(query);
-      
-              items = await cursor.toArray();
+                const query = { movieId: movieId };
+
+                const cursor = reviewCollection.find(query);
+
+                items = await cursor.toArray();
             }
-      
-      
-      
-      
+
+
+
+
             console.log(items);
             res.send(items);
         })
+        app.put('/reacts', async (req, res) => {
+            const reactDetailes = req.body;
+            const filter = { email: reactDetailes.email  , movieID : reactDetailes.id};
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: reactDetailes,
+            };
+            const result = await reactsCollection.updateOne(filter, updateDoc, options);
+
+            res.send(result);
+        })
+
+
+        app.get('/react/:id', async (req, res) => {
+            const movieId = req.params.id
+            const query1 = { moviedId: movieId, react: 'Liked' }
+            const query2 = { movieId: movieId, react: 'Unliked' }
+            const query3 = { movieId: movieId, favourite: 'Loved' }
+
+
+            const likeCount = await reactsCollection.find(query1).count()
+            const unlikeCount = await reactsCollection.find(query2).count()
+            const favCount = await reactsCollection.find(query3).count()
+
+            const react = {
+                like: likeCount,
+                unlike: unlikeCount,
+                fav: favCount
+            }
+
+            res.send(react);
+        })
+
+        app.get('/reactDetailes/:email/:id', async (req, res) => {
+            const email = req.params.email
+            const id = req.params.id
+            const query = { email: email, movieId: id }
+
+
+            const cursor = reactsCollection.find(query)
+
+
+            const items = await cursor.toArray();
+
+            res.send(items);
+        })
+
+        app.put('/user', async (req, res) => {
+            const userDetailes = req.body;
+            const filter = { email: userDetailes.email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: userDetailes,
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+
+            res.send(result);
+        })
+
 
     } finally {
         /* await client.close(); */
