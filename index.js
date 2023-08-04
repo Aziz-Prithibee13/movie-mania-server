@@ -158,8 +158,8 @@ async function run() {
 
         app.get('/react/:id', async (req, res) => {
             const movieId = req.params.id
-            const query1 = { movieId: movieId, react: 'Liked' }
-            const query2 = { movieId: movieId, react: 'Unliked' }
+            const query1 = { movieId: movieId, like: 'Liked' }
+            const query2 = { movieId: movieId, unlike: 'Unliked' }
             const query3 = { movieId: movieId, favourite: 'Loved' }
 
 
