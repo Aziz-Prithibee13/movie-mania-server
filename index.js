@@ -145,7 +145,7 @@ async function run() {
         })
         app.put('/reacts', async (req, res) => {
             const reactDetailes = req.body;
-            const filter = { email: reactDetailes.email  , movieID : reactDetailes.id};
+            const filter = { email: reactDetailes.email  , movieId : reactDetailes.id};
             const options = { upsert: true };
             const updateDoc = {
                 $set: reactDetailes,
@@ -158,7 +158,7 @@ async function run() {
 
         app.get('/react/:id', async (req, res) => {
             const movieId = req.params.id
-            const query1 = { moviedId: movieId, react: 'Liked' }
+            const query1 = { movieId: movieId, react: 'Liked' }
             const query2 = { movieId: movieId, react: 'Unliked' }
             const query3 = { movieId: movieId, favourite: 'Loved' }
 
