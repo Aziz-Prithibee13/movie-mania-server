@@ -145,7 +145,7 @@ async function run() {
         })
         app.put('/reacts', async (req, res) => {
             const reactDetailes = req.body;
-            const filter = { email: reactDetailes.email  , movieId : reactDetailes.id};
+            const filter = { email: reactDetailes.email  , movieId : reactDetailes.movieId};
             const options = { upsert: true };
             const updateDoc = {
                 $set: reactDetailes,
