@@ -202,6 +202,17 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/userName' , async(req,res)=>
+        {
+            const query = {}
+            const cursor =  await usersCollection.distinct("name")
+
+            
+
+            res.send(cursor)
+
+        })
+
 
     } finally {
         /* await client.close(); */
