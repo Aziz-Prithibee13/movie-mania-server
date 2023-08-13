@@ -115,9 +115,9 @@ async function run() {
 
         })
 
-        app.get("/review", async (req, res) => {
-            const email = req.query.email
-            const movieId = req.query.id
+        app.get("/review/:email/:id", async (req, res) => {
+            const email = req.params.email
+            const movieId = req.params.id
 
             let items;
 
