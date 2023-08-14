@@ -37,6 +37,7 @@ async function run() {
         const reviewCollection = client.db("Movie-Mania").collection("reviews");
         const reactsCollection = client.db("Movie-Mania").collection("reacts");
         const usersCollection = client.db("Movie-Mania").collection("users");
+        const plotCollection = client.db("Movie-Mania").collection("plot");
 
 
 
@@ -211,6 +212,16 @@ async function run() {
 
             res.send(cursor)
 
+        })
+
+
+        app.get("/plot/:id" , async(req,res)=>
+        {
+            const id = req.params.id
+            const query = {_id : ObjectId(id)}
+            const cursor = plotCollection.find(query)
+            const items = await cursor.toArray()
+            res.send(items)
         })
 
 
