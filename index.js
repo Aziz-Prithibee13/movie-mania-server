@@ -218,7 +218,7 @@ async function run() {
         app.get("/plot/:id" , async(req,res)=>
         {
             const id = req.params.id
-            const query = {_id : ObjectId(id)}
+            const query = {movieID : id}
             const cursor = plotCollection.find(query)
             const items = await cursor.toArray()
             res.send(items)
