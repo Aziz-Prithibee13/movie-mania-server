@@ -123,21 +123,32 @@ async function run() {
             let items;
 
 
-            if (email) {
-                const query = { email: email , movieId : movieId};
 
-                const cursor = reviewCollection.find(query);
+            const query = { email: email, movieId: movieId };
 
-                items = await cursor.toArray();
-            }
-            else {
-                const query = { movieId: movieId };
+            const cursor = reviewCollection.find(query);
 
-                const cursor = reviewCollection.find(query);
+            items = await cursor.toArray();
 
-                items = await cursor.toArray();
-            }
 
+
+            console.log(items);
+            res.send(items);
+        })
+
+        app.get("/review/:id", async (req, res) => {
+
+            const movieId = req.params.id
+
+            let items;
+
+
+
+            const query = { movieId: movieId };
+
+            const cursor = reviewCollection.find(query);
+
+            items = await cursor.toArray();
 
 
 
@@ -146,7 +157,7 @@ async function run() {
         })
         app.put('/reacts', async (req, res) => {
             const reactDetailes = req.body;
-            const filter = { email: reactDetailes.email  , movieId : reactDetailes.movieId};
+            const filter = { email: reactDetailes.email, movieId: reactDetailes.movieId };
             const options = { upsert: true };
             const updateDoc = {
                 $set: reactDetailes,
@@ -203,22 +214,20 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/userName' , async(req,res)=>
-        {
+        app.get('/userName', async (req, res) => {
             const query = {}
-            const cursor =  await usersCollection.distinct("name")
+            const cursor = await usersCollection.distinct("name")
 
-            
+
 
             res.send(cursor)
 
         })
 
 
-        app.get("/plot/:id" , async(req,res)=>
-        {
+        app.get("/plot/:id", async (req, res) => {
             const id = req.params.id
-            const query = {movieID : id}
+            const query = { movieID: id }
             const cursor = plotCollection.find(query)
             const items = await cursor.toArray()
             res.send(items)
