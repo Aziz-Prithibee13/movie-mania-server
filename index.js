@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const teachableMachine = require("@sashido/teachablemachine-node");
 
-const { Mongoose, default: mongoose, Types: { ObjectId } } = require('mongoose');
+const { Mongoose, default: mongoose } = require('mongoose');
 
 const { gqlHandler } = require('./Model/Gql')
 
@@ -17,7 +17,7 @@ const app = express();
 app.use(cors())
 app.use(express.json())
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion , ObjectId } = require('mongodb');
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dbobibq.mongodb.net/?retryWrites=true&w=majority`;
@@ -229,6 +229,16 @@ async function run() {
             const id = req.params.id
             const query = { movieID: id }
             const cursor = plotCollection.find(query)
+            const items = await cursor.toArray()
+            res.send(items)
+        })
+
+
+        app.get("/movie/:id" , async(req,res)=>
+        {
+            const id = req.params.id
+            const query = { _id : new ObjectId(id) }
+            const cursor = moviesCollection.find(query)
             const items = await cursor.toArray()
             res.send(items)
         })
